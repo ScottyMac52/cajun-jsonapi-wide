@@ -45,6 +45,7 @@ namespace json
     inline void Writer::Write(const UnknownElement& elementRoot, std::wostream& ostr) { Write_i(elementRoot, ostr); }
     inline void Writer::Write(const Object& object, std::wostream& ostr) { Write_i(object, ostr); }
     inline void Writer::Write(const Array& array, std::wostream& ostr) { Write_i(array, ostr); }
+    inline void Writer::Write(const Integer& integer, std::wostream& ostr) { Write_i(integer, ostr); }
     inline void Writer::Write(const Number& number, std::wostream& ostr) { Write_i(number, ostr); }
     inline void Writer::Write(const String& string, std::wostream& ostr) { Write_i(string, ostr); }
     inline void Writer::Write(const Boolean& boolean, std::wostream& ostr) { Write_i(boolean, ostr); }
@@ -73,8 +74,8 @@ namespace json
             m_ostr << L'[' << std::endl;
             ++m_nTabDepth;
 
-            Array::const_iterator it(array.Begin()),
-                itEnd(array.End());
+            auto it(array.Begin()),
+                 itEnd(array.End());
             while (it != itEnd) {
                 m_ostr << std::wstring(m_nTabDepth, L'\t');
 
@@ -99,8 +100,8 @@ namespace json
             m_ostr << L'{' << std::endl;
             ++m_nTabDepth;
 
-            Object::const_iterator it(object.Begin()),
-                itEnd(object.End());
+            auto it(object.Begin()),
+                 itEnd(object.End());
             while (it != itEnd) {
                 m_ostr << std::wstring(m_nTabDepth, L'\t');
 
@@ -119,6 +120,12 @@ namespace json
         }
     }
 
+    inline void Writer::Write_i(const Integer& numberElement)
+    {
+        m_ostr << std::dec << std::setprecision(0) << numberElement.Value();
+    }
+
+	
     inline void Writer::Write_i(const Number& numberElement)
     {
         m_ostr << std::dec << std::setprecision(20) << numberElement.Value();
@@ -133,17 +140,17 @@ namespace json
     {
         m_ostr << '"';
 
-        const std::wstring& s = stringElement.Value();
-        std::wstring::const_iterator it(s.begin()),
-            itEnd(s.end());
+        const auto& s = stringElement.Value();
+        auto it(s.begin()),
+             itEnd(s.end());
         for (; it != itEnd; ++it)
         {
             // check for UTF-8 unicode encoding
-            unsigned char u = static_cast<unsigned char>(*it);
+            auto u = static_cast<unsigned char>(*it);
             if (u & 0xc0) {
                 if ((u & 0xe0) == 0xc0) {
                     // two-character sequence
-                    int x = (*it & 0x1f) << 6;
+                    auto x = (*it & 0x1f) << 6;
                     if ((it + 1) == itEnd) {
                         m_ostr << *it; continue;
                     }
@@ -159,7 +166,7 @@ namespace json
                 }
                 else if ((u & 0xf0) == 0xe0) {
                     // three-character sequence
-                    int x = (u & 0x0f) << 12;
+                    auto x = (u & 0x0f) << 12;
                     if ((it + 1) == itEnd) {
                         m_ostr << *it; continue;
                     }
@@ -209,6 +216,7 @@ namespace json
 
     inline void Writer::Visit(const Array& array) { Write_i(array); }
     inline void Writer::Visit(const Object& object) { Write_i(object); }
+    inline void Writer::Visit(const Integer& integer) { Write_i(integer); }
     inline void Writer::Visit(const Number& number) { Write_i(number); }
     inline void Writer::Visit(const String& string) { Write_i(string); }
     inline void Writer::Visit(const Boolean& boolean) { Write_i(boolean); }

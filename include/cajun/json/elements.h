@@ -67,6 +67,7 @@ namespace json
     typedef TrivialType_T<double> Number;
     typedef TrivialType_T<bool> Boolean;
     typedef TrivialType_T<std::wstring> String;
+    typedef TrivialType_T<int> Integer;
 
     class Object;
     class Array;
@@ -108,6 +109,7 @@ namespace json
         UnknownElement(const UnknownElement& unknown);
         UnknownElement(const Object& object);
         UnknownElement(const Array& array);
+        UnknownElement(const Integer& integer);
         UnknownElement(const Number& number);
         UnknownElement(const Boolean& boolean);
         UnknownElement(const String& string);
@@ -120,6 +122,7 @@ namespace json
         // implicit cast to actual element type. throws on failure
         operator const Object& () const;
         operator const Array& () const;
+        operator const Integer& () const;
         operator const Number& () const;
         operator const Boolean& () const;
         operator const String& () const;
@@ -128,6 +131,7 @@ namespace json
         // implicit cast to actual element type. *converts* on failure, and always returns success
         operator Object& ();
         operator Array& ();
+        operator Integer& ();
         operator Number& ();
         operator Boolean& ();
         operator String& ();

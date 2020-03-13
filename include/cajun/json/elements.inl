@@ -92,6 +92,7 @@ namespace json
     {
         virtual void Visit(const Array& array) {}
         virtual void Visit(const Object& object) {}
+        virtual void Visit(const Integer& integer) {}
         virtual void Visit(const Number& number) {}
         virtual void Visit(const String& wstring) {}
         virtual void Visit(const Boolean& boolean) {}
@@ -112,6 +113,7 @@ namespace json
     {
         virtual void Visit(Array& array) {}
         virtual void Visit(Object& object) {}
+        virtual void Visit(Integer& integer) {}
         virtual void Visit(Number& number) {}
         virtual void Visit(String& wstring) {}
         virtual void Visit(Boolean& boolean) {}
@@ -134,6 +136,7 @@ namespace json
     inline UnknownElement::UnknownElement(const UnknownElement& unknown) : m_pImp(unknown.m_pImp->Clone()) {}
     inline UnknownElement::UnknownElement(const Object& object) : m_pImp(new Imp_T<Object>(object)) {}
     inline UnknownElement::UnknownElement(const Array& array) : m_pImp(new Imp_T<Array>(array)) {}
+    inline UnknownElement::UnknownElement(const Integer& integer) : m_pImp(new Imp_T<Integer>(integer)) {}
     inline UnknownElement::UnknownElement(const Number& number) : m_pImp(new Imp_T<Number>(number)) {}
     inline UnknownElement::UnknownElement(const Boolean& boolean) : m_pImp(new Imp_T<Boolean>(boolean)) {}
     inline UnknownElement::UnknownElement(const String& wstring) : m_pImp(new Imp_T<String>(wstring)) {}
@@ -143,6 +146,7 @@ namespace json
 
     inline UnknownElement::operator const Object& () const { return CastTo<Object>(); }
     inline UnknownElement::operator const Array& () const { return CastTo<Array>(); }
+    inline UnknownElement::operator const Integer& () const { return CastTo<Integer>(); }
     inline UnknownElement::operator const Number& () const { return CastTo<Number>(); }
     inline UnknownElement::operator const Boolean& () const { return CastTo<Boolean>(); }
     inline UnknownElement::operator const String& () const { return CastTo<String>(); }
@@ -150,6 +154,7 @@ namespace json
 
     inline UnknownElement::operator Object& () { return ConvertTo<Object>(); }
     inline UnknownElement::operator Array& () { return ConvertTo<Array>(); }
+    inline UnknownElement::operator Integer& () { return ConvertTo<Integer>(); }
     inline UnknownElement::operator Number& () { return ConvertTo<Number>(); }
     inline UnknownElement::operator Boolean& () { return ConvertTo<Boolean>(); }
     inline UnknownElement::operator String& () { return ConvertTo<String>(); }
@@ -163,7 +168,7 @@ namespace json
             // we might be copying from a subtree of ourselves. delete the old imp
             //  only after the clone operation is complete. yes, this could be made 
             //  more efficient, but isn't worth the complexity
-            Imp* pOldImp = m_pImp;
+            auto pOldImp = m_pImp;
             m_pImp = unknown.m_pImp->Clone();
             delete pOldImp;
         }
@@ -174,28 +179,28 @@ namespace json
     inline UnknownElement& UnknownElement::operator[] (const std::wstring& key)
     {
         // the people want an object. make us one if we aren't already
-        Object& object = ConvertTo<Object>();
+        auto& object = ConvertTo<Object>();
         return object[key];
     }
 
     inline const UnknownElement& UnknownElement::operator[] (const std::wstring& key) const
     {
         // throws if we aren't an object
-        const Object& object = CastTo<Object>();
+        const auto& object = CastTo<Object>();
         return object[key];
     }
 
     inline UnknownElement& UnknownElement::operator[] (size_t index)
     {
         // the people want an array. make us one if we aren't already
-        Array& array = ConvertTo<Array>();
+        auto& array = ConvertTo<Array>();
         return array[index];
     }
 
     inline const UnknownElement& UnknownElement::operator[] (size_t index) const
     {
         // throws if we aren't an array
-        const Array& array = CastTo<Array>();
+        const auto& array = CastTo<Array>();
         return array[index];
     }
 
@@ -297,7 +302,7 @@ namespace json
 
     inline Object::iterator Object::Insert(const Member& member, iterator itWhere)
     {
-        iterator it = Find(member.name);
+	    auto it = Find(member.name);
         if (it != m_Members.end())
             throw Exception(std::wstring(L"Object member already exists: ") + member.name);
 
@@ -312,8 +317,7 @@ namespace json
 
     inline UnknownElement& Object::operator [](const std::wstring& name)
     {
-
-        iterator it = Find(name);
+	    auto it = Find(name);
         if (it == m_Members.end())
         {
             Member member(name);
@@ -324,7 +328,7 @@ namespace json
 
     inline const UnknownElement& Object::operator [](const std::wstring& name) const
     {
-        const_iterator it = Find(name);
+	    auto it = Find(name);
         if (it == End())
             throw Exception(std::wstring(L"Object member not found: ") + name);
         return it->element;
@@ -379,7 +383,7 @@ namespace json
 
     inline UnknownElement& Array::operator[] (size_t index)
     {
-        size_t nMinSize = index + 1; // zero indexed
+	    auto nMinSize = index + 1; // zero indexed
         if (m_Elements.size() < nMinSize)
             m_Elements.resize(nMinSize);
         return m_Elements[index];

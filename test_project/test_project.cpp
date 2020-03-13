@@ -65,6 +65,7 @@ int main()
     objAPA[L"Name"] = String(L"Schlafly American Pale Ale");
     objAPA[L"Origin"] = String(L"St. Louis, MO, USA");
     objAPA[L"ABV"] = Number(3.8);
+    objAPA[L"xOffset"] = Integer(345);
     objAPA[L"BottleConditioned"] = Boolean(true);
 
     Array arrayBeer;
@@ -81,6 +82,7 @@ int main()
     objDocument[L"Delicious Beers"][1][L"Name"] = String(L"John Smith's Extra Smooth");
     objDocument[L"Delicious Beers"][1][L"Origin"] = String(L"Tadcaster, Yorkshire, UK");
     objDocument[L"Delicious Beers"][1][L"ABV"] = Number(3.8);
+    objDocument[L"Delicious Beers"][1][L"xOffset"] = Integer(5432);
     objDocument[L"Delicious Beers"][1][L"BottleConditioned"] = Boolean(false);
 
 
@@ -89,7 +91,7 @@ int main()
 
     // perform all read operations on a const ref, otherwise we may end up
     //  manipulating the document instead of catching errors
-    const Object& objRoot = objDocument;
+    const auto& objRoot = objDocument;
 
     // the return type of Object::operator[string] & Array::operator[size_t] is UnknownElement, which 
     //  provides implicit casting to any of the other element types...
@@ -101,25 +103,26 @@ int main()
     //  one step further. operator[string] implicitly casts to Object, and operator[size_t] to Array.
     //  the return value is another UnknownElement, so these operations can be strung together
     const Number numAbv1 = objRoot[L"Delicious Beers"][1][L"ABV"];
+    const Integer intAbv1 = objRoot[L"Delicious Beers"][1][L"xOffset"];
 
     std::wcout << L"First beer name: " << strName0.Value() << std::endl;
-    std::wcout << L"First beer ABV: " << numAbv1.Value() << std::endl;
+    std::wcout << L"First beer ABV: " << numAbv1.Value() << intAbv1.Value() <<  std::endl;
 
     // we can also iterate through the child elements of an array or object, which is necessary
     //  when we don't know the structure of the document
-    Array::const_iterator itBeers(arrayBeers.Begin()),
-        itBeersEnd(arrayBeers.End());
+    auto itBeers(arrayBeers.Begin()),
+         itBeersEnd(arrayBeers.End());
     for (; itBeers != itBeersEnd; ++itBeers)
     {
         // remember, *itArray is an UnknownElement, which can be implicitly cast to another element type
         const Object& objBeer = *itBeers;
-        Object::const_iterator itBeerFacts(objBeer.Begin()),
-            itBeerFactsEnd(objBeer.End());
+        auto itBeerFacts(objBeer.Begin()),
+             itBeerFactsEnd(objBeer.End());
         for (; itBeerFacts != itBeerFactsEnd; ++itBeerFacts)
         {
-            const Object::Member& member = *itBeerFacts;
-            const std::wstring& name = member.name;
-            const UnknownElement& element = member.element;
+            const auto& member = *itBeerFacts;
+            const auto& name = member.name;
+            const auto& element = member.element;
 
             // if we didn't know the structure of the itBeerFacts subtree, we could visit it
             // element.Accept(nonExistantVisitor);
@@ -153,7 +156,7 @@ int main()
     {
         // objRoot["Delicious Beers"] is an Array, not another Object, so the second chained operator[string] will fail
         std::wcout << L"Expecting exception: Bad cast" << std::endl;
-        const UnknownElement& elem = objRoot[L"Delicious Beers"][L"Some Object Member"];
+        const auto& elem = objRoot[L"Delicious Beers"][L"Some Object Member"];
     }
     catch (json::Exception & e)
     {
@@ -165,10 +168,10 @@ int main()
     // document deep copying
 
     // we can make an exact duplicate too
-    Object objRoot2 = objRoot;
+    auto objRoot2 = objRoot;
 
     // the two documents should start out equal
-    bool bEqualInitially = (objRoot == objRoot2);
+    auto bEqualInitially = (objRoot == objRoot2);
     std::wcout << L"Document copies should start out equivalent. operator == returned: "
         << (bEqualInitially ? L"true" : L"false") << std::endl;
 
@@ -178,7 +181,7 @@ int main()
     array.Erase(array.Begin()); // trim it down to one. this leaves elemRoot the same
 
     // the two documents should start out equal
-    bool bEqualNow = (objRoot == objRoot2);
+    auto bEqualNow = (objRoot == objRoot2);
     std::wcout << L"Document copies should now be different. operator == returned: "
         << (bEqualNow ? L"true" : L"false") << std::endl << std::endl;
 
@@ -198,7 +201,7 @@ int main()
     Reader::Read(elemRootFile, stream);
 
     // still look right?
-    bool bEquals = (objRoot == elemRootFile);
+    auto bEquals = (objRoot == elemRootFile);
     std::wcout << L"Original document and streamed document should be equivalent. operator == returned: "
         << (bEquals ? L"true" : L"false") << std::endl << std::endl;
 
