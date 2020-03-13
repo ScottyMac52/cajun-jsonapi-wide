@@ -41,6 +41,7 @@ namespace json
         static void Write(const Object& object, std::wostream& ostr);
         static void Write(const Array& array, std::wostream& ostr);
         static void Write(const String& string, std::wostream& ostr);
+        static void Write(const Integer& integer, std::wostream& ostr);
         static void Write(const Number& number, std::wostream& ostr);
         static void Write(const Boolean& boolean, std::wostream& ostr);
         static void Write(const Null& null, std::wostream& ostr);
@@ -55,6 +56,7 @@ namespace json
         void Write_i(const Object& object);
         void Write_i(const Array& array);
         void Write_i(const String& string);
+        void Write_i(const Integer& integer);
         void Write_i(const Number& number);
         void Write_i(const Boolean& boolean);
         void Write_i(const Null& null);
@@ -62,6 +64,7 @@ namespace json
 
         virtual void Visit(const Array& array);
         virtual void Visit(const Object& object);
+        virtual void Visit(const Integer& integer);
         virtual void Visit(const Number& number);
         virtual void Visit(const String& string);
         virtual void Visit(const Boolean& boolean);

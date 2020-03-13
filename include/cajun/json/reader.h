@@ -82,6 +82,7 @@ namespace json
         static void Read(Object& object, std::wistream& istr);
         static void Read(Array& array, std::wistream& istr);
         static void Read(String& wstring, std::wistream& istr);
+        static void Read(Integer& integer, std::wistream& istr);
         static void Read(Number& number, std::wistream& istr);
         static void Read(Boolean& boolean, std::wistream& istr);
         static void Read(Null& null, std::wistream& istr);
@@ -102,6 +103,7 @@ namespace json
                 TOKEN_MEMBER_ASSIGN, //    :
                 TOKEN_STRING,        //    "xxx"
                 TOKEN_NUMBER,        //    [+/-]000.000[e[+/-]000]
+                TOKEN_INTEGER,       //    [+/-]000.000[e[+/-]000] stored as int 
                 TOKEN_BOOLEAN,       //    true -or- false
                 TOKEN_NULL,          //    null
             };
@@ -134,6 +136,7 @@ namespace json
         void Parse(Object& object, TokenStream& tokenStream);
         void Parse(Array& array, TokenStream& tokenStream);
         void Parse(String& wstring, TokenStream& tokenStream);
+        void Parse(Integer& number, TokenStream& tokenStream);
         void Parse(Number& number, TokenStream& tokenStream);
         void Parse(Boolean& boolean, TokenStream& tokenStream);
         void Parse(Null& null, TokenStream& tokenStream);
